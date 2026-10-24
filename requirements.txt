@@ -1,9 +1,10 @@
-# Pin tested versions after the Issue #1 smoke runs.
-torch
-scikit-learn
-skorch
-pandas
-numpy
-matplotlib
-seaborn
-imbalanced-learn
+# Versions reported by the verified Kaggle environment (Python 3.13.15).
+# Kaggle torch build: 2.11.0+cu128; retain Kaggle's installed CUDA build.
+torch==2.11.0
+scikit-learn==1.6.1
+skorch==1.4.0
+pandas==2.3.3
+numpy==2.1.3
+matplotlib==3.10.0
+seaborn==0.13.2
+imbalanced-learn==0.14.2

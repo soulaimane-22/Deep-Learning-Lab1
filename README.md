@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Repository scaffold only. Training, tuning, and evaluation remain to be implemented. Start with [Issue #1](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/1).
+**Status:** Issue #1 setup is complete: both downloaded Kaggle notebooks contain successful environment and dataset checks, and the regression notebook includes the successful synthetic PyTorch/GridSearchCV smoke test. Lab modeling, tuning, and evaluation remain to be implemented. Next: [Issue #2](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/2).
 
 ## Datasets and tasks
 
@@ -20,16 +20,18 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook will run independently from top to bottom. The current notebooks contain section placeholders only.
+Each notebook is intended to run independently from top to bottom. Environment and dataset checks have saved outputs; later lab sections remain placeholders.
 
 ## Setup and execution
 
 1. Import the appropriate notebook into Kaggle and attach its dataset.
-2. Install the packages in [requirements.txt](requirements.txt); record and pin tested versions during Issue #1.
+2. Use the versions recorded in [requirements.txt](requirements.txt). The exported notebooks currently install skorch and imbalanced-learn without pins; compare their printed versions with this file when rerunning.
 3. Configure dataset paths, seeds, and GPU/CPU device selection.
 4. After implementation, run each notebook from a fresh session with **Run All**.
 
 Kaggle notebook links and measured runtime: _to add_.
+
+Verified setup: Python 3.13.15, Tesla T4, PyTorch 2.11.0+cu128, seed 42, and automatic CPU fallback. The regression CSV has 851,264 rows and 7 columns; the maintenance CSV has 10,000 rows, 10 columns, and six failure-type classes. These are setup checks, not model evaluation results. Notebook code was executed in Kaggle; local review inspected saved code and outputs only.
 
 ## Evaluation plan
 
