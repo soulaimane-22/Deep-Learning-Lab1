@@ -1,0 +1,25 @@
+# Datasets and credentials
+data/*
+!data/.gitkeep
+.env
+.env.*
+!.env.example
+kaggle.json
+# Python and notebook caches
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+# Large training artifacts
+*.pt
+*.pth
+*.ckpt
+# Local tooling
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+# Planning inputs remain outside this repository
+github_repo_proposal.md
+LAB 1.pdf

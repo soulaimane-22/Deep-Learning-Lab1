@@ -1,0 +1,9 @@
+# Pin tested versions after the Issue #1 smoke runs.
+torch
+scikit-learn
+skorch
+pandas
+numpy
+matplotlib
+seaborn
+imbalanced-learn
