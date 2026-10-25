@@ -1,0 +1,101 @@
+{
+  "symbol": "AAPL",
+  "seed": 42,
+  "shared_settings": {
+    "hidden_layers": [
+      32,
+      16
+    ],
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "batch_size": 32,
+    "max_epochs": 50
+  },
+  "selection_metric": "2015 validation RMSE in USD",
+  "selected_mlp_variant": "Batch normalization",
+  "selected_mlp_epoch": 50,
+  "best_validation_method": "Persistence",
+  "experiments": [
+    {
+      "name": "Reference",
+      "dropout": 0.0,
+      "l2_lambda": 0.0,
+      "batch_norm": false,
+      "early_stopping": false,
+      "epochs_run": 50,
+      "selected_epoch": 50
+    },
+    {
+      "name": "Dropout",
+      "dropout": 0.1,
+      "l2_lambda": 0.0,
+      "batch_norm": false,
+      "early_stopping": false,
+      "epochs_run": 50,
+      "selected_epoch": 50
+    },
+    {
+      "name": "L2",
+      "dropout": 0.0,
+      "l2_lambda": 0.0001,
+      "batch_norm": false,
+      "early_stopping": false,
+      "epochs_run": 50,
+      "selected_epoch": 50
+    },
+    {
+      "name": "Batch normalization",
+      "dropout": 0.0,
+      "l2_lambda": 0.0,
+      "batch_norm": true,
+      "early_stopping": false,
+      "epochs_run": 50,
+      "selected_epoch": 50
+    },
+    {
+      "name": "Early stopping",
+      "dropout": 0.0,
+      "l2_lambda": 0.0,
+      "batch_norm": false,
+      "early_stopping": true,
+      "epochs_run": 50,
+      "selected_epoch": 48
+    }
+  ],
+  "early_stopping": {
+    "patience": 10,
+    "min_delta": 1e-05,
+    "restore": "Lowest observed validation MSE"
+  },
+  "l2_definition": "lambda * sum of squared Linear weights; biases excluded",
+  "preprocessing": {
+    "fit_partition": "2010\u20132014 training data",
+    "input_mean": [
+      66.2041493898778,
+      66.80434929543428,
+      65.52910099460526,
+      66.17888394891791,
+      113954331.66268894
+    ],
+    "input_scale": [
+      21.61218086618637,
+      21.78662664441151,
+      21.44152377066595,
+      21.609816084854884,
+      59616507.54667656
+    ],
+    "target_mean": [
+      66.24237411609603
+    ],
+    "target_scale": [
+      21.622345470933272
+    ]
+  },
+  "final_evaluation": {
+    "test_period": "2016",
+    "refit_before_test": false,
+    "report_all_predefined_variants": true,
+    "test_used_for_selection": false,
+    "epoch_curves": "Reporting only; no selection using test curves"
+  }
+}

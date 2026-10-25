@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Issues #1–#4 are complete: setup, AAPL EDA, baseline regression, and chronological hyperparameter tuning. Next: [Issue #5 — Regression regularization and final evaluation](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/5).
+**Status:** Issues #1–#5 are complete, including Part 1 final test evaluation. Next: [Issue #6 — Maintenance preprocessing and EDA](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/6).
 
 ## Datasets and tasks
 
@@ -20,7 +20,7 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Regularization and final test evaluation remain.
+Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Part 1 regularization and final evaluation also have saved outputs; Part 2 modeling remains.
 
 ## Setup and execution
 
@@ -68,7 +68,7 @@ Split records: [dates and counts](reports/results/aapl_split_summary.csv), [excl
 
 ## Baseline regression
 
-The 5–32–16–1 ReLU MLP (737 parameters) uses training-only input/target standardization, Adam (learning rate 0.001), batch size 32, and 100 fixed epochs. Metrics below use original USD price units. The test set remains unevaluated.
+The 5–32–16–1 ReLU MLP (737 parameters) uses training-only input/target standardization, Adam (learning rate 0.001), batch size 32, and 100 fixed epochs. Metrics below use original USD price units. At the baseline stage, the test set had not been evaluated; final results are reported below.
 
 | Model | Partition | MAE | RMSE | R² |
 |---|---|---:|---:|---:|
@@ -97,10 +97,37 @@ Selected: Adam, learning rate 0.001, hidden layers (32, 16), batch size 32, and 
 | Original MLP | 1.607750 | 2.054546 | 0.927940 |
 | CV-selected MLP | 1.615260 | 2.063188 | 0.927332 |
 
-The selected model does not improve on the original baseline in 2015, and persistence remains strongest. The 2016 test set remains unevaluated. A fixed reporting rerun reproduced the selected model's validation predictions exactly and supplied the learning curves without checkpoint selection.
+The selected model does not improve on the original baseline in 2015, and persistence remains strongest. The 2016 test set was reserved until the final evaluation reported below. A fixed reporting rerun reproduced the selected model's validation predictions exactly and supplied the learning curves without checkpoint selection.
 
 ![Search and validation comparison](assets/plots/aapl_gridsearch_and_validation_comparison.png)
 
 ![Selected model learning curves](assets/plots/aapl_tuned_learning_curves.png)
 
 Saved evidence: [configuration](reports/results/aapl_gridsearch_config.json), [fold boundaries](reports/results/aapl_gridsearch_folds.csv), [full CV results](reports/results/aapl_gridsearch_cv_results.csv), [ranking](reports/results/aapl_gridsearch_ranking.csv), [comparison](reports/results/aapl_tuning_comparison.csv), [validation predictions](reports/results/aapl_tuned_validation_predictions.csv), and [reporting history](reports/results/aapl_tuned_reporting_history.csv).
+
+## Regularization and final test evaluation
+
+Five variants used the same training partition, training-fitted scalers, seed, Adam learning rate 0.001, batch size 32, and maximum 50 epochs. Dropout used probability 0.1; explicit L2 used coefficient 0.0001 on linear weights only. Batch normalization added 96 trainable parameters. Early stopping reached 50 epochs and restored epoch 48; it did not save training epochs in this run.
+
+Batch normalization was selected among the regularization variants using 2015 validation RMSE (2.008407 USD), while persistence was the preferred overall method (1.966823 USD). These choices were frozen before evaluating 2016. Test results did not change the selected model or epoch.
+
+| Model | Test MAE (USD) | Test RMSE (USD) | Test R² |
+|---|---:|---:|---:|
+| Persistence | 1.047450 | 1.500136 | 0.961452 |
+| Original MLP (100 epochs) | 1.092752 | 1.514151 | 0.960728 |
+| CV-selected MLP | 1.131629 | 1.556521 | 0.958499 |
+| Reference | 1.116967 | 1.561191 | 0.958250 |
+| Dropout | 1.304080 | 1.718157 | 0.949433 |
+| L2 | 1.134871 | 1.579619 | 0.957258 |
+| Batch normalization | 1.074130 | 1.515713 | 0.960647 |
+| Early stopping | 1.053585 | 1.502869 | 0.961311 |
+
+Persistence remained best on the test set. Early stopping was close, but was not selected retrospectively using test results. None of the tested neural networks beat persistence. These findings are limited to AAPL, one temporal split, one seed, and the tested configurations.
+
+Reference and L2 losses stabilized after initial improvement; dropout and batch normalization fluctuated more. Train/test curves use plain MSE in USD², excluding regularization penalties, and R² in place of classification accuracy. Test epoch curves were produced from saved checkpoints for reporting only, with selected checkpoints restored afterward.
+
+![Regularization comparison](assets/plots/aapl_regularization_comparison.png)
+
+![Training and test curves](assets/plots/aapl_regularization_train_test_curves.png)
+
+Evidence: [frozen plan](reports/results/aapl_regularization_frozen_plan.json), [validation comparison](reports/results/aapl_regularization_comparison.csv), [final test metrics](reports/results/aapl_final_test_metrics.csv), [test predictions](reports/results/aapl_final_test_predictions.csv), and [test epoch history](reports/results/aapl_regularization_test_epoch_history.csv).
