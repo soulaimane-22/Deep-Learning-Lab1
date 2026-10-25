@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Issues #1 and #2 are complete: Kaggle setup, dataset inspection, AAPL EDA, and chronological split checks. Next: [Issue #3 — Regression baseline](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/3).
+**Status:** Issues #1–#3 are complete: Kaggle setup, AAPL EDA, chronological split checks, and baseline regression. Next: [Issue #4 — Regression hyperparameter tuning](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/4).
 
 ## Datasets and tasks
 
@@ -20,7 +20,7 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook is intended to run independently from top to bottom. Environment checks and regression EDA have saved outputs; modeling sections remain placeholders.
+Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Tuning, regularization, and final test evaluation remain.
 
 ## Setup and execution
 
@@ -65,3 +65,22 @@ Training-only analysis shows strongly correlated OHLC prices, right-skewed volum
 Additional plots: [distributions and boxplots](assets/plots/aapl_training_distributions_boxplots.png), [correlations](assets/plots/aapl_training_correlations.png), and [next-day changes](assets/plots/aapl_training_next_day_changes.png).
 
 Split records: [dates and counts](reports/results/aapl_split_summary.csv), [excluded examples](reports/results/aapl_excluded_boundary_rows.csv), and [export provenance](reports/results/README.md).
+
+## Baseline regression
+
+The 5–32–16–1 ReLU MLP (737 parameters) uses training-only input/target standardization, Adam (learning rate 0.001), batch size 32, and 100 fixed epochs. Metrics below use original USD price units. The test set remains unevaluated.
+
+| Model | Partition | MAE | RMSE | R² |
+|---|---|---:|---:|---:|
+| Persistence | Training | 0.790716 | 1.135872 | 0.997240 |
+| Persistence | Validation | 1.497729 | 1.966823 | 0.933962 |
+| MLP, epoch 100 | Training | 0.807170 | 1.137929 | 0.997230 |
+| MLP, epoch 100 | Validation | 1.607750 | 2.054546 | 0.927940 |
+
+The MLP does not beat persistence: validation MAE is about 7.3% higher and RMSE 4.5% higher. Learning improves rapidly initially, then validation loss plateaus with fluctuations. These curves alone do not establish progressive overfitting.
+
+![Baseline architecture](assets/plots/aapl_baseline_architecture.png)
+
+![Baseline learning curves](assets/plots/aapl_baseline_learning_curves.png)
+
+Saved evidence: [configuration](reports/results/aapl_baseline_config.json), [100-epoch history](reports/results/aapl_baseline_training_history.csv), [comparison](reports/results/aapl_baseline_comparison.csv), and [validation predictions](reports/results/aapl_baseline_validation_predictions.csv).

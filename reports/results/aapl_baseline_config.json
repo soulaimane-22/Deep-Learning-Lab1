@@ -1,0 +1,58 @@
+{
+  "symbol": "AAPL",
+  "features": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume"
+  ],
+  "target": "next_close",
+  "seed": 42,
+  "architecture": {
+    "input_dim": 5,
+    "hidden_layers": [
+      32,
+      16
+    ],
+    "activation": "ReLU",
+    "output_dim": 1,
+    "trainable_parameters": 737
+  },
+  "training": {
+    "optimizer": "Adam",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "epochs": 100,
+    "loss": "MSE on standardized target",
+    "shuffle_training_batches": true,
+    "early_stopping": false,
+    "weight_decay": 0.0,
+    "selection": "Fixed final epoch; no checkpoint selection",
+    "device": "cuda"
+  },
+  "preprocessing": {
+    "fit_partition": "train",
+    "input_mean": [
+      66.2041493898778,
+      66.80434929543428,
+      65.52910099460526,
+      66.17888394891791,
+      113954331.66268894
+    ],
+    "input_scale": [
+      21.61218086618637,
+      21.78662664441151,
+      21.44152377066595,
+      21.609816084854884,
+      59616507.54667656
+    ],
+    "target_mean": [
+      66.24237411609603
+    ],
+    "target_scale": [
+      21.622345470933272
+    ]
+  },
+  "test_evaluated": false
+}
