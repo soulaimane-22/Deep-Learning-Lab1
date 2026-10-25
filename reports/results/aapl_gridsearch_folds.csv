@@ -1,0 +1,4 @@
+fold,fit_samples,score_samples,fit_first_date,fit_last_input_date,fit_last_target_date,score_first_input_date,score_last_target_date
+1,656,200,2010-01-04,2012-08-08,2012-08-09,2012-08-10,2013-05-31
+2,856,200,2010-01-04,2013-05-29,2013-05-30,2013-05-31,2014-03-18
+3,1056,200,2010-01-04,2014-03-14,2014-03-17,2014-03-18,2014-12-31

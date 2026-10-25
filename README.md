@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Issues #1–#3 are complete: Kaggle setup, AAPL EDA, chronological split checks, and baseline regression. Next: [Issue #4 — Regression hyperparameter tuning](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/4).
+**Status:** Issues #1–#4 are complete: setup, AAPL EDA, baseline regression, and chronological hyperparameter tuning. Next: [Issue #5 — Regression regularization and final evaluation](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/5).
 
 ## Datasets and tasks
 
@@ -20,7 +20,7 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Tuning, regularization, and final test evaluation remain.
+Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Regularization and final test evaluation remain.
 
 ## Setup and execution
 
@@ -84,3 +84,23 @@ The MLP does not beat persistence: validation MAE is about 7.3% higher and RMSE 
 ![Baseline learning curves](assets/plots/aapl_baseline_learning_curves.png)
 
 Saved evidence: [configuration](reports/results/aapl_baseline_config.json), [100-epoch history](reports/results/aapl_baseline_training_history.csv), [comparison](reports/results/aapl_baseline_comparison.csv), and [validation predictions](reports/results/aapl_baseline_validation_predictions.csv).
+
+## Regression hyperparameter tuning
+
+GridSearchCV compared 16 configurations across three expanding chronological folds within 2010–2014 (48 fits plus one refit). Each scoring fold has 200 samples, with a one-row gap. Input and target scaling are fitted within each fold; target-shape checks prevent loss broadcasting. Selection uses mean CV MSE in original USD² units.
+
+Selected: Adam, learning rate 0.001, hidden layers (32, 16), batch size 32, and 50 epochs. Mean CV MSE is 2.163347 USD². This is the best configuration in the tested grid, not a guarantee of better future performance.
+
+| Model | 2015 validation MAE | RMSE | R² |
+|---|---:|---:|---:|
+| Persistence | 1.497729 | 1.966823 | 0.933962 |
+| Original MLP | 1.607750 | 2.054546 | 0.927940 |
+| CV-selected MLP | 1.615260 | 2.063188 | 0.927332 |
+
+The selected model does not improve on the original baseline in 2015, and persistence remains strongest. The 2016 test set remains unevaluated. A fixed reporting rerun reproduced the selected model's validation predictions exactly and supplied the learning curves without checkpoint selection.
+
+![Search and validation comparison](assets/plots/aapl_gridsearch_and_validation_comparison.png)
+
+![Selected model learning curves](assets/plots/aapl_tuned_learning_curves.png)
+
+Saved evidence: [configuration](reports/results/aapl_gridsearch_config.json), [fold boundaries](reports/results/aapl_gridsearch_folds.csv), [full CV results](reports/results/aapl_gridsearch_cv_results.csv), [ranking](reports/results/aapl_gridsearch_ranking.csv), [comparison](reports/results/aapl_tuning_comparison.csv), [validation predictions](reports/results/aapl_tuned_validation_predictions.csv), and [reporting history](reports/results/aapl_tuned_reporting_history.csv).
