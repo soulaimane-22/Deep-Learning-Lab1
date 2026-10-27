@@ -1,0 +1,55 @@
+model,true_class,Heat Dissipation Failure,No Failure,Overstrain Failure,Power Failure,Random Failures,Tool Wear Failure
+Majority-class baseline,Heat Dissipation Failure,0,67,0,0,0,0
+Majority-class baseline,No Failure,0,5792,0,0,0,0
+Majority-class baseline,Overstrain Failure,0,46,0,0,0,0
+Majority-class baseline,Power Failure,0,57,0,0,0,0
+Majority-class baseline,Random Failures,0,11,0,0,0,0
+Majority-class baseline,Tool Wear Failure,0,27,0,0,0,0
+CV-selected MLP,Heat Dissipation Failure,67,0,0,0,0,0
+CV-selected MLP,No Failure,35,5754,2,0,0,1
+CV-selected MLP,Overstrain Failure,0,3,43,0,0,0
+CV-selected MLP,Power Failure,3,6,1,47,0,0
+CV-selected MLP,Random Failures,0,11,0,0,0,0
+CV-selected MLP,Tool Wear Failure,0,25,0,0,0,2
+Unresampled MLP,Heat Dissipation Failure,33,32,2,0,0,0
+Unresampled MLP,No Failure,9,5776,1,6,0,0
+Unresampled MLP,Overstrain Failure,0,21,24,1,0,0
+Unresampled MLP,Power Failure,0,10,4,43,0,0
+Unresampled MLP,Random Failures,0,11,0,0,0,0
+Unresampled MLP,Tool Wear Failure,0,27,0,0,0,0
+Oversampled MLP,Heat Dissipation Failure,66,0,1,0,0,0
+Oversampled MLP,No Failure,90,5073,78,39,222,290
+Oversampled MLP,Overstrain Failure,0,0,46,0,0,0
+Oversampled MLP,Power Failure,0,0,0,57,0,0
+Oversampled MLP,Random Failures,0,0,0,0,11,0
+Oversampled MLP,Tool Wear Failure,0,0,0,0,0,27
+Reference,Heat Dissipation Failure,63,3,1,0,0,0
+Reference,No Failure,1,5788,1,2,0,0
+Reference,Overstrain Failure,0,3,43,0,0,0
+Reference,Power Failure,0,6,0,51,0,0
+Reference,Random Failures,0,11,0,0,0,0
+Reference,Tool Wear Failure,0,25,0,0,0,2
+Dropout,Heat Dissipation Failure,63,4,0,0,0,0
+Dropout,No Failure,1,5789,0,2,0,0
+Dropout,Overstrain Failure,0,12,34,0,0,0
+Dropout,Power Failure,0,9,0,48,0,0
+Dropout,Random Failures,0,11,0,0,0,0
+Dropout,Tool Wear Failure,0,27,0,0,0,0
+L2,Heat Dissipation Failure,63,3,1,0,0,0
+L2,No Failure,5,5783,0,4,0,0
+L2,Overstrain Failure,0,10,36,0,0,0
+L2,Power Failure,3,7,2,45,0,0
+L2,Random Failures,0,11,0,0,0,0
+L2,Tool Wear Failure,0,26,0,0,0,1
+Batch normalization,Heat Dissipation Failure,58,8,1,0,0,0
+Batch normalization,No Failure,3,5788,0,1,0,0
+Batch normalization,Overstrain Failure,0,21,25,0,0,0
+Batch normalization,Power Failure,0,5,0,52,0,0
+Batch normalization,Random Failures,0,11,0,0,0,0
+Batch normalization,Tool Wear Failure,0,24,0,0,0,3
+Early stopping,Heat Dissipation Failure,58,8,1,0,0,0
+Early stopping,No Failure,6,5776,5,5,0,0
+Early stopping,Overstrain Failure,0,1,45,0,0,0
+Early stopping,Power Failure,0,3,0,54,0,0
+Early stopping,Random Failures,0,11,0,0,0,0
+Early stopping,Tool Wear Failure,0,27,0,0,0,0

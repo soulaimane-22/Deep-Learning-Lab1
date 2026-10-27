@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Both parts have saved final test results. Classification tuning (#9) is complete; #10 awaits per-class training exports. Final reproducibility and synthesis review (#11–#12) remain.
+**Status:** Both parts have saved final test results. Classification tuning and evaluation (#9–#10) are complete, including per-class training and test exports. Final reproducibility and synthesis review (#11–#12) remain.
 
 ## Datasets and tasks
 
