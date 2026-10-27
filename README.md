@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Issues #1–#5 are complete, including Part 1 final test evaluation. Next: [Issue #6 — Maintenance preprocessing and EDA](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/6).
+**Status:** Part 1 is complete. Maintenance preprocessing, the baseline classifier (#8), and oversampling comparison (#7) have saved Kaggle results. Next: [Issue #9 — Classification tuning](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/9). The classification test set remains unevaluated.
 
 ## Datasets and tasks
 
@@ -20,7 +20,7 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook is intended to run independently from top to bottom. Environment checks, regression EDA, and baseline training have saved outputs. Part 1 regularization and final evaluation also have saved outputs; Part 2 modeling remains.
+Each notebook is intended to run independently from top to bottom. Part 1 has saved outputs through final evaluation. Part 2 has saved outputs through the baseline and oversampling comparison; tuning and final evaluation remain pending.
 
 ## Setup and execution
 
@@ -131,3 +131,21 @@ Reference and L2 losses stabilized after initial improvement; dropout and batch 
 ![Training and test curves](assets/plots/aapl_regularization_train_test_curves.png)
 
 Evidence: [frozen plan](reports/results/aapl_regularization_frozen_plan.json), [validation comparison](reports/results/aapl_regularization_comparison.csv), [final test metrics](reports/results/aapl_final_test_metrics.csv), [test predictions](reports/results/aapl_final_test_predictions.csv), and [test epoch history](reports/results/aapl_regularization_test_epoch_history.csv).
+
+## Classification baseline and oversampling
+
+The six-class maintenance task uses stratified training/validation/test partitions of 6,000/2,000/2,000 records (seed 42). UDI, Product ID, and binary Target are excluded. The 27 binary/multiclass label disagreements are documented; supplied multiclass labels are retained. Training-only scaling and one-hot encoding produce eight inputs. Random Failures has only 11 training and three validation observations.
+
+Both MLPs use an 8–32–16–6 ReLU architecture (918 parameters), unweighted cross-entropy, Adam at 0.001, batch size 64, and 4,700 optimizer updates. Random oversampling repeats training observations to 5,792 per class (34,752 total). Final-batch sizes differ between loaders. Training metrics use the original 6,000 rows; validation retains its original distribution. Both runs retain their final weights without checkpoint selection.
+
+| Model | Validation accuracy | Macro-recall | Macro-F1 |
+|---|---:|---:|---:|
+| Majority class | 0.965000 | 0.166667 | 0.163698 |
+| Unresampled MLP | 0.980000 | 0.442047 | 0.500755 |
+| Oversampled MLP | 0.878500 | 0.729026 | 0.482743 |
+
+Oversampling improves recall for four failure classes but increases false alarms from 2 to 233 among 1,930 No Failure records. Tool Wear recall rises to 7/9 with precision only 6.48%; Random Failures remains undetected (0/3). The unresampled model is preferred by the primary validation macro-F1 criterion. These are single-seed comparisons with small minority supports. Classification test data remain unevaluated. Future CV must fit preprocessing and any resampling within each training fold.
+
+![Sampling learning comparison](assets/plots/maintenance_sampling_learning_comparison.png)
+
+Evidence: [comparison](reports/results/maintenance_sampling_comparison.csv), [baseline configuration](reports/results/maintenance_baseline_config.json), [oversampling configuration](reports/results/maintenance_oversampling_config.json), [baseline confusion matrix](assets/plots/maintenance_baseline_validation_confusion.png), and [oversampled confusion matrix](assets/plots/maintenance_oversampled_validation_confusion.png).

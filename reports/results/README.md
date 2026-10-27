@@ -13,3 +13,7 @@ Issue #4 outputs were downloaded directly from Kaggle. Local review checked 16 c
 ## Regularization and final evaluation outputs
 
 Issue #5 exports were downloaded from Kaggle. Local verification recomputed all eight final metric rows from 251 saved test predictions, checked five training histories and 250 test-epoch rows against selected checkpoints, and confirmed that the frozen plan selects batch normalization using validation. Early stopping restores epoch 48 after 50 epochs. No model training was run locally.
+
+## Maintenance preprocessing, baseline, and oversampling
+
+Classification tables and plots were downloaded from Kaggle. The oversampled confusion-matrix PNG was recovered from the notebook's embedded saved image because its separate download was missing. Local review checked notebook syntax and saved errors, 10,000 unique split assignments, both sets of 2,000 validation predictions against confusion matrices and per-class reports, all four comparison rows against the final history records, and 50 evaluation points per run. Recomputed validation macro-F1 values are 0.5007548376 (unresampled) and 0.4827429213 (oversampled). Configurations confirm no test evaluation. No model training was run locally; a fresh-session Kaggle rerun remains part of the final reproducibility review.

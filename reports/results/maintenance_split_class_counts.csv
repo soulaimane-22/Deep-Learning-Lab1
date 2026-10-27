@@ -1,0 +1,7 @@
+Failure Type,train,validation,test
+Heat Dissipation Failure,67,23,22
+No Failure,5792,1930,1930
+Overstrain Failure,46,16,16
+Power Failure,57,19,19
+Random Failures,11,3,4
+Tool Wear Failure,27,9,9

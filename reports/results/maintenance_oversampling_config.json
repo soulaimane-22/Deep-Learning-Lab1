@@ -1,0 +1,64 @@
+{
+  "seed": 42,
+  "method": "RandomOverSampler",
+  "sampling_strategy": "not majority",
+  "original_training_samples": 6000,
+  "resampled_training_samples": 34752,
+  "class_counts": [
+    {
+      "failure_type": "Heat Dissipation Failure",
+      "original_count": 67,
+      "balanced_count": 5792,
+      "multiplication_factor": 86.44776119402985
+    },
+    {
+      "failure_type": "No Failure",
+      "original_count": 5792,
+      "balanced_count": 5792,
+      "multiplication_factor": 1.0
+    },
+    {
+      "failure_type": "Overstrain Failure",
+      "original_count": 46,
+      "balanced_count": 5792,
+      "multiplication_factor": 125.91304347826087
+    },
+    {
+      "failure_type": "Power Failure",
+      "original_count": 57,
+      "balanced_count": 5792,
+      "multiplication_factor": 101.6140350877193
+    },
+    {
+      "failure_type": "Random Failures",
+      "original_count": 11,
+      "balanced_count": 5792,
+      "multiplication_factor": 526.5454545454545
+    },
+    {
+      "failure_type": "Tool Wear Failure",
+      "original_count": 27,
+      "balanced_count": 5792,
+      "multiplication_factor": 214.5185185185185
+    }
+  ],
+  "architecture": [
+    8,
+    32,
+    16,
+    6
+  ],
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "optimizer_updates": 4700,
+  "evaluation_interval_updates": 94,
+  "selection": "Fixed final update; no checkpoint selection",
+  "preprocessing_fit_partition": "Original training data",
+  "training_metrics_partition": "Original unresampled training data",
+  "validation_resampled": false,
+  "test_evaluated": false,
+  "primary_comparison_metric": "Validation macro-F1",
+  "budget_note": "Matched optimizer updates; final-batch sizes differ between loaders.",
+  "cv_policy": "Fit preprocessing and resampling inside each training fold; never pass these globally oversampled arrays into cross-validation."
+}

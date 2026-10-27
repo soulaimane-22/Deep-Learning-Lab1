@@ -1,0 +1,7 @@
+true_class,Heat Dissipation Failure,No Failure,Overstrain Failure,Power Failure,Random Failures,Tool Wear Failure
+Heat Dissipation Failure,23,0,0,0,0,0
+No Failure,22,1697,22,13,76,100
+Overstrain Failure,1,0,14,0,0,1
+Power Failure,1,1,1,16,0,0
+Random Failures,0,3,0,0,0,0
+Tool Wear Failure,0,1,1,0,0,7

@@ -1,0 +1,83 @@
+{
+  "target": "Failure Type",
+  "numeric_features": [
+    "Air temperature [K]",
+    "Process temperature [K]",
+    "Rotational speed [rpm]",
+    "Torque [Nm]",
+    "Tool wear [min]"
+  ],
+  "categorical_features": [
+    "Type"
+  ],
+  "excluded_columns": [
+    "UDI",
+    "Product ID",
+    "Target"
+  ],
+  "encoded_features": [
+    "numeric__Air temperature [K]",
+    "numeric__Process temperature [K]",
+    "numeric__Rotational speed [rpm]",
+    "numeric__Torque [Nm]",
+    "numeric__Tool wear [min]",
+    "categorical__Type_H",
+    "categorical__Type_L",
+    "categorical__Type_M"
+  ],
+  "label_mapping": {
+    "Heat Dissipation Failure": 0,
+    "No Failure": 1,
+    "Overstrain Failure": 2,
+    "Power Failure": 3,
+    "Random Failures": 4,
+    "Tool Wear Failure": 5
+  },
+  "split": {
+    "method": "Two-stage stratified random split",
+    "seed": 42,
+    "train_samples": 6000,
+    "validation_samples": 2000,
+    "test_samples": 2000
+  },
+  "numeric_scaling": {
+    "fit_partition": "Original training data",
+    "mean": [
+      299.98420000000004,
+      309.99314999999996,
+      1534.9788333333333,
+      40.17576666666667,
+      107.91016666666667
+    ],
+    "scale": [
+      2.0205148749761777,
+      1.489861764560726,
+      177.0927611506812,
+      9.990014318252447,
+      63.38581147732424
+    ]
+  },
+  "categorical_encoding": {
+    "method": "OneHotEncoder",
+    "categories": [
+      "H",
+      "L",
+      "M"
+    ],
+    "handle_unknown": "ignore"
+  },
+  "cv": {
+    "method": "StratifiedKFold",
+    "n_splits": 3,
+    "shuffle": true,
+    "seed": 42,
+    "preprocessing": "Fit separately within each training fold",
+    "resampling": "Training folds only, when enabled"
+  },
+  "label_disagreements": {
+    "count": 27,
+    "policy": "Keep supplied Failure Type labels and all rows"
+  },
+  "balancing_applied": false,
+  "test_evaluated": false
+}
