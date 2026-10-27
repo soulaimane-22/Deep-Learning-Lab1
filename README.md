@@ -2,7 +2,7 @@
 
 This lab uses PyTorch multilayer perceptrons (MLPs) for stock-price regression and multiclass machine-failure classification. It compares baseline models, hyperparameter tuning, and regularization.
 
-The complete code and outputs are in [the regression notebook](notebooks/01_regression.ipynb) and [the classification notebook](notebooks/02_classification.ipynb). Experiments were run in Kaggle with seed 42 and a Tesla T4 GPU. Package versions are recorded in [requirements.txt](requirements.txt). Attach the corresponding dataset and run each notebook from top to bottom. Numerical results below come from the saved runs; a fresh-session rerun has not yet been verified.
+The complete code and outputs are in [the regression notebook](notebooks/01_regression.ipynb) and [the classification notebook](notebooks/02_classification.ipynb). Experiments were run in Kaggle with seed 42 and a Tesla T4 GPU.
 
 ## Part 1: Stock-price regression
 
