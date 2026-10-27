@@ -4,7 +4,7 @@
 
 PyTorch DNN/MLP experiments for regression and multiclass classification.
 
-**Status:** Part 1 is complete. Maintenance preprocessing, the baseline classifier (#8), and oversampling comparison (#7) have saved Kaggle results. Next: [Issue #9 — Classification tuning](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues/9). The classification test set remains unevaluated.
+**Status:** Both parts have saved final test results. Classification tuning (#9) is complete; #10 awaits per-class training exports. Final reproducibility and synthesis review (#11–#12) remain.
 
 ## Datasets and tasks
 
@@ -20,7 +20,7 @@ Record exact filenames, stock/date coverage, targets, features, and class labels
 - [Regression](notebooks/01_regression.ipynb)
 - [Classification](notebooks/02_classification.ipynb)
 
-Each notebook is intended to run independently from top to bottom. Part 1 has saved outputs through final evaluation. Part 2 has saved outputs through the baseline and oversampling comparison; tuning and final evaluation remain pending.
+Each notebook is intended to run independently from top to bottom. Part 1 has saved outputs through final evaluation. Part 2 has saved outputs through tuning, regularization, and frozen test evaluation.
 
 ## Setup and execution
 
@@ -144,8 +144,35 @@ Both MLPs use an 8–32–16–6 ReLU architecture (918 parameters), unweighted 
 | Unresampled MLP | 0.980000 | 0.442047 | 0.500755 |
 | Oversampled MLP | 0.878500 | 0.729026 | 0.482743 |
 
-Oversampling improves recall for four failure classes but increases false alarms from 2 to 233 among 1,930 No Failure records. Tool Wear recall rises to 7/9 with precision only 6.48%; Random Failures remains undetected (0/3). The unresampled model is preferred by the primary validation macro-F1 criterion. These are single-seed comparisons with small minority supports. Classification test data remain unevaluated. Future CV must fit preprocessing and any resampling within each training fold.
+Oversampling improves recall for four failure classes but increases false alarms from 2 to 233 among 1,930 No Failure records. Tool Wear recall rises to 7/9 with precision only 6.48%; Random Failures remains undetected (0/3). The unresampled model is preferred by the primary validation macro-F1 criterion. These are single-seed comparisons with small minority supports. At the oversampling comparison stage, classification test data had not yet been evaluated. Future CV must fit preprocessing and any resampling within each training fold.
 
 ![Sampling learning comparison](assets/plots/maintenance_sampling_learning_comparison.png)
 
 Evidence: [comparison](reports/results/maintenance_sampling_comparison.csv), [baseline configuration](reports/results/maintenance_baseline_config.json), [oversampling configuration](reports/results/maintenance_oversampling_config.json), [baseline confusion matrix](assets/plots/maintenance_baseline_validation_confusion.png), and [oversampled confusion matrix](assets/plots/maintenance_oversampled_validation_confusion.png).
+
+
+## Classification tuning and final evaluation
+
+A three-fold GridSearchCV compared 16 unresampled configurations (48 fits), fitting preprocessing within each training fold. Adam at 0.005, hidden layers (32, 16), batch size 64, and 100 epochs achieved mean CV macro-F1 0.536721 and validation macro-F1 0.539219. A reporting rerun reproduced validation probabilities exactly.
+
+Five controlled variants used these settings. Reference led on validation macro-F1 (0.601341), ahead of early stopping (0.594252), and its epoch-100 checkpoint was frozen before test evaluation. Early stopping ran 61 epochs and restored epoch 46. The manual Reference and earlier skorch refit use different training loops and are distinct runs; Reference is the direct control for regularization.
+
+| Model | Test accuracy | Test macro-recall | Test macro-F1 |
+|---|---:|---:|---:|
+| Reference (preselected) | 0.984500 | 0.531390 | 0.570124 |
+| Early stopping | 0.987000 | 0.594551 | 0.599975 |
+| Dropout | 0.983000 | 0.509274 | 0.554148 |
+| L2 | 0.980000 | 0.504719 | 0.522181 |
+| CV-selected MLP | 0.980000 | 0.589916 | 0.559920 |
+| Batch normalization | 0.981500 | 0.464241 | 0.520147 |
+| Unresampled MLP | 0.978000 | 0.419149 | 0.485091 |
+| Oversampled MLP | 0.869500 | 0.664160 | 0.463491 |
+| Majority baseline | 0.965000 | 0.166667 | 0.163698 |
+
+Early stopping achieved the highest observed test macro-F1, without changing the validation-based selection. Reference detected 18/22 Heat Dissipation, 11/16 Overstrain, and 13/19 Power failures, with three false alarms among 1,930 No Failure rows. It missed all four Random and nine Tool Wear failures. High accuracy therefore masks important limitations; minority supports are small and results use one seed and split.
+
+Training loss fell while held-out loss increased later for Reference and batch normalization, consistent with overfitting. Epoch fluctuations are expected with mini-batch optimization. All 461 saved checkpoint evaluations were reporting-only; selected checkpoints were restored afterward.
+
+![Final macro-F1 comparison](assets/plots/maintenance_final_macro_f1_comparison.png)
+
+Evidence: [search configuration](reports/results/maintenance_gridsearch_config.json), [frozen plan](reports/results/maintenance_regularization_frozen_plan.json), [test metrics](reports/results/maintenance_final_test_metrics.csv), [test reports](reports/results/maintenance_final_test_classification_reports.csv), and [epoch curves](assets/plots/maintenance_regularization_train_test_curves.png).
