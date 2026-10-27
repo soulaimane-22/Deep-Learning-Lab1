@@ -1,7 +1,0 @@
-class_id,failure_type
-0,Heat Dissipation Failure
-1,No Failure
-2,Overstrain Failure
-3,Power Failure
-4,Random Failures
-5,Tool Wear Failure

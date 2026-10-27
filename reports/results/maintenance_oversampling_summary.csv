@@ -1,7 +1,0 @@
-failure_type,original_count,balanced_count,multiplication_factor
-Heat Dissipation Failure,67,5792,86.44776119402985
-No Failure,5792,5792,1.0
-Overstrain Failure,46,5792,125.91304347826087
-Power Failure,57,5792,101.6140350877193
-Random Failures,11,5792,526.5454545454545
-Tool Wear Failure,27,5792,214.5185185185185

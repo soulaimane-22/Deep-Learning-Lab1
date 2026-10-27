@@ -21,3 +21,5 @@ Thumbs.db
 # Planning inputs remain outside this repository
 github_repo_proposal.md
 LAB 1.pdf
+# Local experiment exports and reports
+/reports/

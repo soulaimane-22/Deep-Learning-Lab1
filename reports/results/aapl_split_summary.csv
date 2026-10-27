@@ -1,4 +1,0 @@
-split,samples,first_input_date,last_input_date,first_target_date,last_target_date
-train,1257,2010-01-04,2014-12-30,2010-01-05,2014-12-31
-validation,251,2015-01-02,2015-12-30,2015-01-05,2015-12-31
-test,251,2016-01-04,2016-12-29,2016-01-05,2016-12-30

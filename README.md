@@ -99,8 +99,16 @@ Reference and batch normalization continue reducing training loss while test los
 
 Reference correctly identifies 18/22 Heat Dissipation, 11/16 Overstrain, and 13/19 Power failures. It produces only three false alarms among 1,930 No Failure records, but misses all four Random and nine Tool Wear failures. High accuracy therefore does not mean that every failure type is detected reliably.
 
-Full [training reports](reports/results/maintenance_final_train_classification_reports.csv), [test reports](reports/results/maintenance_final_test_classification_reports.csv), and other [result tables](reports/results/) provide per-class precision, recall, F1, and support. Results are limited to one seed, one split, and the tested configurations; rare-class scores are especially uncertain.
+The classification notebook includes detailed training and test results, with per-class precision, recall, F1, and support. Results are limited to one seed, one split, and the tested configurations; rare-class scores are especially uncertain.
 
 ## Personal synthesis
 
-The brief personal reflection requested in the lab is kept in [the synthesis report](reports/synthesis.md).
+In this lab, I learned how to build and train MLP models with PyTorch for regression and multiclass classification. I practiced exploring data, scaling numerical features, encoding categories, and choosing the correct output layer and loss function for each task.
+
+I learned that a more complex model is not always better. For AAPL, simply predicting that the next closing price would equal the current price performed better than all the tested neural networks. This showed me why a simple baseline is important.
+
+For classification, I saw why accuracy alone can be misleading. Most records were No Failure, so a model could have high accuracy while missing rare failures. Macro-F1, recall, and confusion matrices helped me see these weaknesses. Oversampling detected more failures, but also produced more false alarms.
+
+GridSearchCV helped me compare learning rates, optimizers, epochs, and architectures. Regularization did not improve every result: L2 reduced validation loss, while the Reference model had the best validation macro-F1. The learning curves also helped me recognize overfitting when training loss decreased but validation loss increased.
+
+Finally, I learned to fit preprocessing only on training data and use validation results to select models before evaluating the test set. For stock prices, chronological splits keep future observations out of training. Early stopping scored better on the classification test set, but I kept the model selected using validation. These results come from one seed and split, and the rare classes contain few examples, so the conclusions remain limited. Future work could test several seeds and use more rare-failure examples to check whether the findings hold.
