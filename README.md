@@ -8,7 +8,7 @@ The complete code and outputs are in [the regression notebook](notebooks/01_regr
 
 ### Data and exploration
 
-The [NYSE dataset](https://www.kaggle.com/datasets/dgawlik/nyse) contains daily stock prices. We use `prices-split-adjusted.csv` and select AAPL, which has 1,762 observations from 2010 to 2016. The task is to predict the next trading day's closing price after the current day's close, using the current open, high, low, close, and volume.
+The [NYSE dataset](https://www.kaggle.com/datasets/dgawlik/nyse) contains daily stock prices. We use split-adjusted prices for AAPL, which has 1,762 observations from 2010 to 2016. The task is to predict the next trading day's closing price after the current day's close, using the current open, high, low, close, and volume.
 
 The dataset checks found no missing values or duplicate stock/date pairs. AAPL has no zero-volume rows or missing dates relative to the dates observed elsewhere in the dataset. Its price changes over time, while trading volume has occasional large spikes. The four price features are strongly correlated. Extreme observations are retained.
 
@@ -49,7 +49,7 @@ Training and test losses fall quickly at the start, then fluctuate. Dropout and 
 
 ### Preprocessing and exploration
 
-The [predictive-maintenance dataset](https://www.kaggle.com/datasets/shivamb/machine-predictive-maintenance-classification) contains 10,000 records in `predictive_maintenance.csv`. The target is **Failure Type**, with six classes: No Failure, Heat Dissipation Failure, Power Failure, Overstrain Failure, Tool Wear Failure, and Random Failures.
+The [predictive-maintenance dataset](https://www.kaggle.com/datasets/shivamb/machine-predictive-maintenance-classification) contains 10,000 machine records. The target is **Failure Type**, with six classes: No Failure, Heat Dissipation Failure, Power Failure, Overstrain Failure, Tool Wear Failure, and Random Failures.
 
 UDI and Product ID are removed as identifiers. The binary Target column is excluded because it contains outcome information. There are 27 disagreements between the binary and multiclass labels; we document them and retain the supplied Failure Type labels. No missing values or duplicate feature combinations were found.
 
