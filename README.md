@@ -1,178 +1,106 @@
 # Deep Learning Lab 1
 
-**Master MBD | FST Tanger | Pr. Elaachak Lotfi**
+This lab uses PyTorch multilayer perceptrons (MLPs) for stock-price regression and multiclass machine-failure classification. It compares baseline models, hyperparameter tuning, and regularization.
 
-PyTorch DNN/MLP experiments for regression and multiclass classification.
+The complete code and outputs are in [the regression notebook](notebooks/01_regression.ipynb) and [the classification notebook](notebooks/02_classification.ipynb). Experiments were run in Kaggle with seed 42 and a Tesla T4 GPU. Package versions are recorded in [requirements.txt](requirements.txt). Attach the corresponding dataset and run each notebook from top to bottom. Numerical results below come from the saved runs; a fresh-session rerun has not yet been verified.
 
-**Status:** Both parts have saved final test results. Classification tuning and evaluation (#9–#10) are complete, including per-class training and test exports. Final reproducibility and synthesis review (#11–#12) remain.
+## Part 1: Stock-price regression
 
-## Datasets and tasks
+### Data and exploration
 
-| Part | Dataset | Planned task |
-|---|---|---|
-| Regression | [NYSE](https://www.kaggle.com/datasets/dgawlik/nyse) | Predict a selected stock's next-day closing price using information available through today |
-| Classification | [Predictive maintenance](https://www.kaggle.com/datasets/shivamb/machine-predictive-maintenance-classification) | Predict the multiclass failure type |
+The [NYSE dataset](https://www.kaggle.com/datasets/dgawlik/nyse) contains daily stock prices. We use `prices-split-adjusted.csv` and select AAPL, which has 1,762 observations from 2010 to 2016. The task is to predict the next trading day's closing price after the current day's close, using the current open, high, low, close, and volume.
 
-Record exact filenames, stock/date coverage, targets, features, and class labels in the notebooks. Dataset files are not committed.
+The dataset checks found no missing values or duplicate stock/date pairs. AAPL has no zero-volume rows or missing dates relative to the dates observed elsewhere in the dataset. Its price changes over time, while trading volume has occasional large spikes. The four price features are strongly correlated. Extreme observations are retained.
 
-## Notebooks
+![AAPL training closing price and volume](assets/plots/aapl_training_price_volume.png)
 
-- [Regression](notebooks/01_regression.ipynb)
-- [Classification](notebooks/02_classification.ipynb)
+Training covers 2010–2014, validation covers 2015, and testing covers 2016. The resulting partitions contain 1,257, 251, and 251 prediction examples. Two examples crossing year boundaries are excluded. Input and target standardization use training data only.
 
-Each notebook is intended to run independently from top to bottom. Part 1 has saved outputs through final evaluation. Part 2 has saved outputs through tuning, regularization, and frozen test evaluation.
+### Architecture and hyperparameter tuning
 
-## Setup and execution
+The baseline MLP has layers **5 → 32 → 16 → 1**, ReLU hidden activations, and a linear output. It uses MSE loss, Adam at learning rate 0.001, batch size 32, and 100 epochs. A persistence baseline predicts that the next close equals the current close.
 
-1. Import the appropriate notebook into Kaggle and attach its dataset.
-2. Use the versions recorded in [requirements.txt](requirements.txt). The exported notebooks currently install skorch and imbalanced-learn without pins; compare their printed versions with this file when rerunning.
-3. Configure dataset paths, seeds, and GPU/CPU device selection.
-4. After implementation, run each notebook from a fresh session with **Run All**.
+GridSearchCV with a skorch wrapper compares 16 configurations across three chronological folds, with a one-row gap between fitting and scoring data. Scaling is fitted within each fold. The grid tests learning rates 0.001 and 0.005, Adam and RMSprop, 50 and 100 epochs, and hidden layers (32, 16) and (64, 32, 16).
 
-Kaggle notebook links and measured runtime: _to add_.
+The selected configuration uses **Adam, learning rate 0.001, hidden layers (32, 16), and 50 epochs**. Its mean CV MSE is 2.1633 USD². Validation RMSE is 2.0632 USD, compared with 2.0545 for the original MLP and 1.9668 for persistence. Tuning therefore does not beat persistence.
 
-Verified setup: Python 3.13.15, Tesla T4, PyTorch 2.11.0+cu128, seed 42, and automatic CPU fallback. The regression CSV has 851,264 rows and 7 columns; the maintenance CSV has 10,000 rows, 10 columns, and six failure-type classes. These are setup checks, not model evaluation results. Notebook code was executed in Kaggle; local review inspected saved code and outputs only.
+### Regularization and results
 
-## Evaluation plan
-
-- Regression: chronological partitions, time-aware CV, persistence baseline, MAE/RMSE/R². Use R²/epoch in place of classification accuracy and explain the substitution.
-- Classification: stratified partitions, training-only balancing, accuracy, macro/per-class recall and F1, class support, and confusion matrices.
-- Fit preprocessing and resampling only within training partitions, including CV folds.
-- Use sklearn GridSearchCV with skorch. Select models using validation/CV only.
-- Freeze model configurations before producing the required final train/test curves and metrics.
-- Compare regularization variants with controlled settings.
-
-## Roadmap
-
-See [the roadmap](ROADMAP.md), [issues](https://github.com/soulaimane-22/Deep-Learning-Lab1/issues), and [milestones](https://github.com/soulaimane-22/Deep-Learning-Lab1/milestones).
-
-## Results
-
-_To complete after experiments. Export small result tables and search configurations to `reports/results/` and plots to `assets/plots/`._
-
-## Synthesis
-
-[Personal synthesis](reports/synthesis.md) — to complete after the experiments.
-
-## Regression EDA
-
-AAPL has 1,762 observations spanning 2010–2016, with no missing observed trading dates or zero-volume rows. The next-day prediction setup yields 1,257 training samples (2010–2014), 251 validation samples (2015), and 251 test samples (2016). Two boundary-crossing examples are excluded. Saved assertions verify disjoint partitions and target alignment.
-
-Training-only analysis shows strongly correlated OHLC prices, right-skewed volume, and occasional large daily price changes. Extreme observations are retained. Scaling must be fitted on training data, and the future MLP will be compared with persistence. Correlation alone does not establish forecasting performance.
-
-![Training price and volume](assets/plots/aapl_training_price_volume.png)
-
-Additional plots: [distributions and boxplots](assets/plots/aapl_training_distributions_boxplots.png), [correlations](assets/plots/aapl_training_correlations.png), and [next-day changes](assets/plots/aapl_training_next_day_changes.png).
-
-Split records: [dates and counts](reports/results/aapl_split_summary.csv), [excluded examples](reports/results/aapl_excluded_boundary_rows.csv), and [export provenance](reports/results/README.md).
-
-## Baseline regression
-
-The 5–32–16–1 ReLU MLP (737 parameters) uses training-only input/target standardization, Adam (learning rate 0.001), batch size 32, and 100 fixed epochs. Metrics below use original USD price units. At the baseline stage, the test set had not been evaluated; final results are reported below.
-
-| Model | Partition | MAE | RMSE | R² |
-|---|---|---:|---:|---:|
-| Persistence | Training | 0.790716 | 1.135872 | 0.997240 |
-| Persistence | Validation | 1.497729 | 1.966823 | 0.933962 |
-| MLP, epoch 100 | Training | 0.807170 | 1.137929 | 0.997230 |
-| MLP, epoch 100 | Validation | 1.607750 | 2.054546 | 0.927940 |
-
-The MLP does not beat persistence: validation MAE is about 7.3% higher and RMSE 4.5% higher. Learning improves rapidly initially, then validation loss plateaus with fluctuations. These curves alone do not establish progressive overfitting.
-
-![Baseline architecture](assets/plots/aapl_baseline_architecture.png)
-
-![Baseline learning curves](assets/plots/aapl_baseline_learning_curves.png)
-
-Saved evidence: [configuration](reports/results/aapl_baseline_config.json), [100-epoch history](reports/results/aapl_baseline_training_history.csv), [comparison](reports/results/aapl_baseline_comparison.csv), and [validation predictions](reports/results/aapl_baseline_validation_predictions.csv).
-
-## Regression hyperparameter tuning
-
-GridSearchCV compared 16 configurations across three expanding chronological folds within 2010–2014 (48 fits plus one refit). Each scoring fold has 200 samples, with a one-row gap. Input and target scaling are fitted within each fold; target-shape checks prevent loss broadcasting. Selection uses mean CV MSE in original USD² units.
-
-Selected: Adam, learning rate 0.001, hidden layers (32, 16), batch size 32, and 50 epochs. Mean CV MSE is 2.163347 USD². This is the best configuration in the tested grid, not a guarantee of better future performance.
-
-| Model | 2015 validation MAE | RMSE | R² |
-|---|---:|---:|---:|
-| Persistence | 1.497729 | 1.966823 | 0.933962 |
-| Original MLP | 1.607750 | 2.054546 | 0.927940 |
-| CV-selected MLP | 1.615260 | 2.063188 | 0.927332 |
-
-The selected model does not improve on the original baseline in 2015, and persistence remains strongest. The 2016 test set was reserved until the final evaluation reported below. A fixed reporting rerun reproduced the selected model's validation predictions exactly and supplied the learning curves without checkpoint selection.
-
-![Search and validation comparison](assets/plots/aapl_gridsearch_and_validation_comparison.png)
-
-![Selected model learning curves](assets/plots/aapl_tuned_learning_curves.png)
-
-Saved evidence: [configuration](reports/results/aapl_gridsearch_config.json), [fold boundaries](reports/results/aapl_gridsearch_folds.csv), [full CV results](reports/results/aapl_gridsearch_cv_results.csv), [ranking](reports/results/aapl_gridsearch_ranking.csv), [comparison](reports/results/aapl_tuning_comparison.csv), [validation predictions](reports/results/aapl_tuned_validation_predictions.csv), and [reporting history](reports/results/aapl_tuned_reporting_history.csv).
-
-## Regularization and final test evaluation
-
-Five variants used the same training partition, training-fitted scalers, seed, Adam learning rate 0.001, batch size 32, and maximum 50 epochs. Dropout used probability 0.1; explicit L2 used coefficient 0.0001 on linear weights only. Batch normalization added 96 trainable parameters. Early stopping reached 50 epochs and restored epoch 48; it did not save training epochs in this run.
-
-Batch normalization was selected among the regularization variants using 2015 validation RMSE (2.008407 USD), while persistence was the preferred overall method (1.966823 USD). These choices were frozen before evaluating 2016. Test results did not change the selected model or epoch.
+Using the tuned settings, we compare a reference model with dropout (0.1), L2 (0.0001 on Linear weights), batch normalization, and early stopping. Early stopping restores epoch 48 after running 50 epochs. Batch normalization is the best regularization variant on validation, but persistence is the best overall validation method. These decisions are fixed before testing.
 
 | Model | Test MAE (USD) | Test RMSE (USD) | Test R² |
 |---|---:|---:|---:|
-| Persistence | 1.047450 | 1.500136 | 0.961452 |
-| Original MLP (100 epochs) | 1.092752 | 1.514151 | 0.960728 |
-| CV-selected MLP | 1.131629 | 1.556521 | 0.958499 |
-| Reference | 1.116967 | 1.561191 | 0.958250 |
-| Dropout | 1.304080 | 1.718157 | 0.949433 |
-| L2 | 1.134871 | 1.579619 | 0.957258 |
-| Batch normalization | 1.074130 | 1.515713 | 0.960647 |
-| Early stopping | 1.053585 | 1.502869 | 0.961311 |
+| Persistence | 1.0475 | 1.5001 | 0.9615 |
+| Original MLP (100 epochs) | 1.0928 | 1.5142 | 0.9607 |
+| CV-selected MLP | 1.1316 | 1.5565 | 0.9585 |
+| Reference | 1.1170 | 1.5612 | 0.9582 |
+| Dropout | 1.3041 | 1.7182 | 0.9494 |
+| L2 | 1.1349 | 1.5796 | 0.9573 |
+| Batch normalization | 1.0741 | 1.5157 | 0.9606 |
+| Early stopping | 1.0536 | 1.5029 | 0.9613 |
 
-Persistence remained best on the test set. Early stopping was close, but was not selected retrospectively using test results. None of the tested neural networks beat persistence. These findings are limited to AAPL, one temporal split, one seed, and the tested configurations.
+Persistence also has the lowest test RMSE. None of the tested MLPs improves on this simple baseline. This result applies to AAPL and the chosen time periods, rather than all stocks.
 
-Reference and L2 losses stabilized after initial improvement; dropout and batch normalization fluctuated more. Train/test curves use plain MSE in USD², excluding regularization penalties, and R² in place of classification accuracy. Test epoch curves were produced from saved checkpoints for reporting only, with selected checkpoints restored afterward.
+![Regression training and test loss and R-squared curves](assets/plots/aapl_regularization_train_test_curves.png)
 
-![Regularization comparison](assets/plots/aapl_regularization_comparison.png)
+Training and test losses fall quickly at the start, then fluctuate. Dropout and batch normalization show larger fluctuations in this run. The loss is MSE in USD², excluding regularization penalties. For regression, we use **R² instead of classification accuracy** because the target is a continuous price. R² compares errors with a mean prediction; it can be negative and is not a percentage of correct predictions. The test curves are for reporting only and do not determine the selected epoch.
 
-![Training and test curves](assets/plots/aapl_regularization_train_test_curves.png)
+## Part 2: Machine-failure classification
 
-Evidence: [frozen plan](reports/results/aapl_regularization_frozen_plan.json), [validation comparison](reports/results/aapl_regularization_comparison.csv), [final test metrics](reports/results/aapl_final_test_metrics.csv), [test predictions](reports/results/aapl_final_test_predictions.csv), and [test epoch history](reports/results/aapl_regularization_test_epoch_history.csv).
+### Preprocessing and exploration
 
-## Classification baseline and oversampling
+The [predictive-maintenance dataset](https://www.kaggle.com/datasets/shivamb/machine-predictive-maintenance-classification) contains 10,000 records in `predictive_maintenance.csv`. The target is **Failure Type**, with six classes: No Failure, Heat Dissipation Failure, Power Failure, Overstrain Failure, Tool Wear Failure, and Random Failures.
 
-The six-class maintenance task uses stratified training/validation/test partitions of 6,000/2,000/2,000 records (seed 42). UDI, Product ID, and binary Target are excluded. The 27 binary/multiclass label disagreements are documented; supplied multiclass labels are retained. Training-only scaling and one-hot encoding produce eight inputs. Random Failures has only 11 training and three validation observations.
+UDI and Product ID are removed as identifiers. The binary Target column is excluded because it contains outcome information. There are 27 disagreements between the binary and multiclass labels; we document them and retain the supplied Failure Type labels. No missing values or duplicate feature combinations were found.
 
-Both MLPs use an 8–32–16–6 ReLU architecture (918 parameters), unweighted cross-entropy, Adam at 0.001, batch size 64, and 4,700 optimizer updates. Random oversampling repeats training observations to 5,792 per class (34,752 total). Final-batch sizes differ between loaders. Training metrics use the original 6,000 rows; validation retains its original distribution. Both runs retain their final weights without checkpoint selection.
+Stratified splits produce 6,000 training, 2,000 validation, and 2,000 test rows. Five numerical measurements are standardized using training statistics. Product Type is one-hot encoded, giving eight inputs. Air and process temperatures are positively correlated; rotational speed and torque are negatively correlated. Overstrain and Tool Wear failure groups have higher tool wear, but the small groups limit the conclusions we can draw.
 
-| Model | Validation accuracy | Macro-recall | Macro-F1 |
-|---|---:|---:|---:|
-| Majority class | 0.965000 | 0.166667 | 0.163698 |
-| Unresampled MLP | 0.980000 | 0.442047 | 0.500755 |
-| Oversampled MLP | 0.878500 | 0.729026 | 0.482743 |
+### Class balancing and baseline model
 
-Oversampling improves recall for four failure classes but increases false alarms from 2 to 233 among 1,930 No Failure records. Tool Wear recall rises to 7/9 with precision only 6.48%; Random Failures remains undetected (0/3). The unresampled model is preferred by the primary validation macro-F1 criterion. These are single-seed comparisons with small minority supports. At the oversampling comparison stage, classification test data had not yet been evaluated. Future CV must fit preprocessing and any resampling within each training fold.
+No Failure represents 96.53% of training rows, while Random Failures has only 11 training examples. We apply random oversampling only to the training partition, repeating minority observations until every class has 5,792 rows. This increases the training set to 34,752 rows without creating new independent observations.
 
-![Sampling learning comparison](assets/plots/maintenance_sampling_learning_comparison.png)
+![Training class counts before and after oversampling](assets/plots/maintenance_oversampling_class_counts.png)
 
-Evidence: [comparison](reports/results/maintenance_sampling_comparison.csv), [baseline configuration](reports/results/maintenance_baseline_config.json), [oversampling configuration](reports/results/maintenance_oversampling_config.json), [baseline confusion matrix](assets/plots/maintenance_baseline_validation_confusion.png), and [oversampled confusion matrix](assets/plots/maintenance_oversampled_validation_confusion.png).
+The baseline MLP has layers **8 → 32 → 16 → 6**, ReLU hidden activations, and six output logits. It uses unweighted cross-entropy, Adam at 0.001, and batch size 64. The unresampled and oversampled models each receive 4,700 optimizer updates. All training metrics are evaluated on the original 6,000 rows.
 
+Oversampling raises validation macro-recall from 0.4420 to 0.7290, but reduces macro-F1 from 0.5008 to 0.4827 and produces more false alarms. We therefore use the unresampled setup for tuning. Validation and test distributions are never balanced.
 
-## Classification tuning and final evaluation
+### Hyperparameter tuning and regularization
 
-A three-fold GridSearchCV compared 16 unresampled configurations (48 fits), fitting preprocessing within each training fold. Adam at 0.005, hidden layers (32, 16), batch size 64, and 100 epochs achieved mean CV macro-F1 0.536721 and validation macro-F1 0.539219. A reporting rerun reproduced validation probabilities exactly.
+GridSearchCV compares the same 16 combinations of learning rate, optimizer, epoch count, and hidden layers as in regression. It uses three stratified folds and fits preprocessing within each fold. Selection uses **macro-F1**, which gives every class equal weight.
 
-Five controlled variants used these settings. Reference led on validation macro-F1 (0.601341), ahead of early stopping (0.594252), and its epoch-100 checkpoint was frozen before test evaluation. Early stopping ran 61 epochs and restored epoch 46. The manual Reference and earlier skorch refit use different training loops and are distinct runs; Reference is the direct control for regularization.
+The selected configuration uses **Adam, learning rate 0.005, hidden layers (32, 16), and 100 epochs**, with batch size 64. Mean CV macro-F1 is 0.5367 and validation macro-F1 is 0.5392.
 
-| Model | Test accuracy | Test macro-recall | Test macro-F1 |
-|---|---:|---:|---:|
-| Reference (preselected) | 0.984500 | 0.531390 | 0.570124 |
-| Early stopping | 0.987000 | 0.594551 | 0.599975 |
-| Dropout | 0.983000 | 0.509274 | 0.554148 |
-| L2 | 0.980000 | 0.504719 | 0.522181 |
-| CV-selected MLP | 0.980000 | 0.589916 | 0.559920 |
-| Batch normalization | 0.981500 | 0.464241 | 0.520147 |
-| Unresampled MLP | 0.978000 | 0.419149 | 0.485091 |
-| Oversampled MLP | 0.869500 | 0.664160 | 0.463491 |
-| Majority baseline | 0.965000 | 0.166667 | 0.163698 |
+We then compare a new Reference run with dropout (0.1), L2 (0.0001), batch normalization, and early stopping under the same settings. This manual training loop differs from the earlier skorch refit, so Reference is the direct control for the regularization comparison. Reference has the best validation macro-F1 (0.6013), and its epoch-100 checkpoint is selected. Early stopping runs 61 epochs and restores epoch 46. L2 has the lowest validation loss, but does not have the highest macro-F1.
 
-Early stopping achieved the highest observed test macro-F1, without changing the validation-based selection. Reference detected 18/22 Heat Dissipation, 11/16 Overstrain, and 13/19 Power failures, with three false alarms among 1,930 No Failure rows. It missed all four Random and nine Tool Wear failures. High accuracy therefore masks important limitations; minority supports are small and results use one seed and split.
+### Training and test results
 
-Training loss fell while held-out loss increased later for Reference and batch normalization, consistent with overfitting. Epoch fluctuations are expected with mini-batch optimization. All 461 saved checkpoint evaluations were reporting-only; selected checkpoints were restored afterward.
+Recall is sensitivity. In this table, recall and F1 are **macro averages across all six classes**; accuracy is the proportion of correctly classified records.
 
-![Final macro-F1 comparison](assets/plots/maintenance_final_macro_f1_comparison.png)
+| Model | Train accuracy | Train recall | Train F1 | Test accuracy | Test recall | Test F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| Reference | 0.9912 | 0.6405 | 0.6613 | 0.9845 | 0.5314 | 0.5701 |
+| Early stopping | 0.9888 | 0.6314 | 0.6231 | 0.9870 | 0.5946 | 0.6000 |
+| Dropout | 0.9890 | 0.5868 | 0.6172 | 0.9830 | 0.5093 | 0.5541 |
+| L2 | 0.9880 | 0.5913 | 0.6125 | 0.9800 | 0.5047 | 0.5222 |
+| CV-selected MLP | 0.9855 | 0.6378 | 0.6240 | 0.9800 | 0.5899 | 0.5599 |
+| Batch normalization | 0.9877 | 0.5720 | 0.6233 | 0.9815 | 0.4642 | 0.5201 |
+| Unresampled MLP | 0.9793 | 0.4610 | 0.5038 | 0.9780 | 0.4191 | 0.4851 |
+| Oversampled MLP | 0.8800 | 0.9768 | 0.5093 | 0.8695 | 0.6642 | 0.4635 |
+| Majority-class baseline | 0.9653 | 0.1667 | 0.1637 | 0.9650 | 0.1667 | 0.1637 |
 
-Evidence: [search configuration](reports/results/maintenance_gridsearch_config.json), [frozen plan](reports/results/maintenance_regularization_frozen_plan.json), [test metrics](reports/results/maintenance_final_test_metrics.csv), [test reports](reports/results/maintenance_final_test_classification_reports.csv), and [epoch curves](assets/plots/maintenance_regularization_train_test_curves.png).
+The preselected Reference model has test macro-F1 0.5701. Early stopping has the highest observed test macro-F1 (0.6000), but we do not change the selected model using test results. Oversampling gives the highest test macro-recall, at the cost of more false alarms and lower macro-F1.
+
+![Classification training and test loss and accuracy curves](assets/plots/maintenance_regularization_train_test_curves.png)
+
+Reference and batch normalization continue reducing training loss while test loss rises later, which is consistent with overfitting. Dropout and L2 have more stable test loss. Small zigzags are expected with mini-batch updates; the overall trend matters more than individual fluctuations. Accuracy stays high because most records are No Failure, so it must be read alongside macro-F1 and per-class recall. Curves use stored checkpoints for reporting only; models are restored to their previously selected epochs afterward.
+
+![Preselected Reference model test confusion matrix](assets/plots/maintenance_selected_test_confusion.png)
+
+Reference correctly identifies 18/22 Heat Dissipation, 11/16 Overstrain, and 13/19 Power failures. It produces only three false alarms among 1,930 No Failure records, but misses all four Random and nine Tool Wear failures. High accuracy therefore does not mean that every failure type is detected reliably.
+
+Full [training reports](reports/results/maintenance_final_train_classification_reports.csv), [test reports](reports/results/maintenance_final_test_classification_reports.csv), and other [result tables](reports/results/) provide per-class precision, recall, F1, and support. Results are limited to one seed, one split, and the tested configurations; rare-class scores are especially uncertain.
+
+## Personal synthesis
+
+The brief personal reflection requested in the lab is kept in [the synthesis report](reports/synthesis.md).

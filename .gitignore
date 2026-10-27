@@ -1,6 +1,4 @@
-# Datasets and credentials
-data/*
-!data/.gitkeep
+# Credentials
 .env
 .env.*
 !.env.example
